@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PT. Infomedia Solusi Humanika - Pencatat Aktivitas Karyawan</title>
+    <title>PT. Infomedia Solusi Humanika Medan - Pencatat Aktivitas Karyawan</title>
     <style>
         /* Desain Umum dan Responsif */
         body {
@@ -324,8 +324,8 @@
             background-color: #e9e9e9;
         }
 
-        /* Notifikasi WhatsApp Simulasi */
-        .whatsapp-note {
+        /* Informasi Umum */
+        .info-note {
             background-color: #d4edda;
             border-left: 5px solid #28a745;
             padding: 15px;
@@ -401,6 +401,10 @@
             font-size: 0.9em;
             background-color: #e0e0e0;
             border-radius: 0 0 10px 10px;
+        }
+        footer p.small-text {
+            font-size: 0.8em; /* Ukuran lebih kecil untuk teks rekomendasi */
+            margin: 5px 0;
         }
 
         /* Animasi dan Interaktivitas */
@@ -500,7 +504,7 @@
     <div class="container" id="mainAppContent" style="display: none;">
         <header>
             <h1>Sistem Pencatat Aktivitas Karyawan</h1>
-            <p>PT. Infomedia Solusi Humanika</p>
+            <p>PT. Infomedia Solusi Humanika Medan</p>
             <button class="logout-button" onclick="performLogout()">Logout</button>
         </header>
 
@@ -531,11 +535,7 @@
                 </div>
                 <button type="submit" class="submit-button">Simpan Aktivitas CMO</button>
             </form>
-            <div class="whatsapp-note">
-                <p><strong>Catatan Penting (Pengiriman WhatsApp Otomatis):</strong> Fungsi pengiriman notifikasi/ringkasan ke WhatsApp (`089520526651`) **tidak dapat diimplementasikan secara otomatis langsung dari browser Anda**. Ini memerlukan **backend server dan integrasi dengan WhatsApp Business API yang kompleks dan berbayar.**</p>
-                <p>Dalam simulasi ini, setelah Anda menekan tombol simpan, sistem akan **mencoba membuka WhatsApp di perangkat Anda** dengan pesan yang sudah terisi. Anda perlu **menekan tombol KIRIM secara manual** di WhatsApp.</p>
-                <p>Data aktivitas akan disimpan di browser Anda secara lokal.</p>
-            </div>
+            <!-- Catatan penting dihapus -->
         </div>
 
         <!-- Tab Content: Rekrutmen Aktivitas -->
@@ -556,11 +556,7 @@
                 </div>
                 <button type="submit" class="submit-button">Simpan Aktivitas Rekrutmen</button>
             </form>
-             <div class="whatsapp-note">
-                <p><strong>Catatan Penting (Pengiriman WhatsApp Otomatis):</strong> Fungsi pengiriman notifikasi/ringkasan ke WhatsApp (`089520526651`) **tidak dapat diimplementasikan secara otomatis langsung dari browser Anda**. Ini memerlukan **backend server dan integrasi dengan WhatsApp Business API yang kompleks dan berbayar.**</p>
-                <p>Dalam simulasi ini, setelah Anda menekan tombol simpan, sistem akan **mencoba membuka WhatsApp di perangkat Anda** dengan pesan yang sudah terisi. Anda perlu **menekan tombol KIRIM secara manual** di WhatsApp.</p>
-                <p>Data aktivitas akan disimpan di browser Anda secara lokal.</p>
-            </div>
+             <!-- Catatan penting dihapus -->
         </div>
 
         <!-- Tab Content: AM Aktivitas -->
@@ -580,11 +576,7 @@
                 </div>
                 <button type="submit" class="submit-button">Simpan Aktivitas AM</button>
             </form>
-             <div class="whatsapp-note">
-                <p><strong>Catatan Penting (Pengiriman WhatsApp Otomatis):</strong> Fungsi pengiriman notifikasi/ringkasan ke WhatsApp (`089520526651`) **tidak dapat diimplementasikan secara otomatis langsung dari browser Anda**. Ini memerlukan **backend server dan integrasi dengan WhatsApp Business API yang kompleks dan berbayar.**</p>
-                <p>Dalam simulasi ini, setelah Anda menekan tombol simpan, sistem akan **mencoba membuka WhatsApp di perangkat Anda** dengan pesan yang sudah terisi. Anda perlu **menekan tombol KIRIM secara manual** di WhatsApp.</p>
-                <p>Data aktivitas akan disimpan di browser Anda secara lokal.</p>
-            </div>
+             <!-- Catatan penting dihapus -->
         </div>
 
         <!-- Tab Content: Ringkasan Harian -->
@@ -647,13 +639,16 @@
                     <tbody>
                         <!-- Data will be populated here -->
                     </tbody>
+                </tbody>
                 </table>
             </div>
         </div>
     </div>
 
     <footer>
-        <p>&copy; 2025 PT. Infomedia Solusi Humanika. Hak Cipta Dilindungi.</p>
+        <p>&copy; 2025 PT. Infomedia Solusi Humanika Medan. Hak Cipta Dilindungi.</p>
+        <p class="small-text">Anak Magang Bagus Prabowo (Politeknik Ganesha Medan)</p>
+        <p class="small-text">Rekomendasi Dari Pak Safrudin HRD PT. Fastrata Buana</p>
     </footer>
 
     <script>
@@ -765,9 +760,7 @@
         }
 
 
-        // --- Logika Form Input Aktivitas & Simulasi WhatsApp ---
-        const whatsappNumber = '6289520526651'; // Nomor WhatsApp target (ganti '0' dengan '62' untuk format internasional)
-
+        // --- Logika Form Input Aktivitas (Tanpa WhatsApp) ---
         function setupForm(formId, department) {
             document.getElementById(formId).addEventListener('submit', function(event) {
                 event.preventDefault(); // Mencegah reload halaman
@@ -775,8 +768,7 @@
                 const employee = this.querySelector('select').value;
                 const description = this.querySelector('textarea').value;
                 const date = new Date().toISOString().slice(0, 10); // Format YYYY-MM-DD
-                const currentTime = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-
+                
                 if (!employee || !description) {
                     alert('Mohon lengkapi semua field!');
                     return;
@@ -796,29 +788,8 @@
 
                 // Perbarui ringkasan harian setelah menyimpan aktivitas
                 updateDailySummary();
-
-                // --- Simulasi Pengiriman WhatsApp (Membutuhkan Interaksi Pengguna) ---
-                const whatsappMessage = encodeURIComponent(
-                    `*Pencatatan Aktivitas PT. Infomedia Solusi Humanika*\n\n` +
-                    `*Bagian:* ${department}\n` +
-                    `*Karyawan:* ${employee}\n` +
-                    `*Deskripsi Aktivitas:* ${description}\n` +
-                    `*Tanggal:* ${date}\n` +
-                    `*Waktu:* ${currentTime}\n\n` +
-                    `Mohon segera ditindaklanjuti.`
-                );
-
-                const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
-
-                console.log(`\n--- SIMULASI PENGIRIMAN WHATSAPP ---`);
-                console.log(`URL WhatsApp yang akan dibuka: ${whatsappUrl}`);
-                console.log(`CATATAN: Pengiriman WhatsApp otomatis tidak mungkin langsung dari browser. Anda perlu MENKAN TOMBOL KIRIM secara manual di aplikasi WhatsApp.`);
-                console.log(`-----------------------------------\n`);
-
-                // Buka WhatsApp di tab/jendela baru
-                window.open(whatsappUrl, '_blank');
-
-                alert(`Sistem akan membuka WhatsApp. Mohon tekan tombol KIRIM di aplikasi WhatsApp untuk menyelesaikan pengiriman notifikasi.`);
+                
+                // Tidak ada lagi kode WhatsApp di sini
             });
         }
 
