@@ -533,9 +533,15 @@
                     <label for="cmoAktivitasDesc">Deskripsi Aktivitas:</label>
                     <textarea id="cmoAktivitasDesc" placeholder="Contoh: Membuat laporan bulanan, Meeting dengan klien X" required></textarea>
                 </div>
+                <div class="form-group">
+                    <label for="cmoDokumentasi">Dokumentasi Gambar (Opsional):</label>
+                    <input type="file" id="cmoDokumentasi" accept="image/*">
+                </div>
                 <button type="submit" class="submit-button">Simpan Aktivitas CMO</button>
             </form>
-            <!-- Catatan penting dihapus -->
+            <div class="info-note">
+                <p><strong>Catatan:</strong> Data aktivitas (termasuk gambar yang akan dikompres) disimpan secara lokal di browser Anda. Gambar akan dikompres saat diunggah untuk efisiensi penyimpanan.</p>
+            </div>
         </div>
 
         <!-- Tab Content: Rekrutmen Aktivitas -->
@@ -554,9 +560,15 @@
                     <label for="rekrutmenAktivitasDesc">Deskripsi Aktivitas:</label>
                     <textarea id="rekrutmenAktivitasDesc" placeholder="Contoh: Interview calon karyawan, Seleksi CV" required></textarea>
                 </div>
+                <div class="form-group">
+                    <label for="rekrutmenDokumentasi">Dokumentasi Gambar (Opsional):</label>
+                    <input type="file" id="rekrutmenDokumentasi" accept="image/*">
+                </div>
                 <button type="submit" class="submit-button">Simpan Aktivitas Rekrutmen</button>
             </form>
-             <!-- Catatan penting dihapus -->
+            <div class="info-note">
+                <p><strong>Catatan:</strong> Data aktivitas (termasuk gambar yang akan dikompres) disimpan secara lokal di browser Anda. Gambar akan dikompres saat diunggah untuk efisiensi penyimpanan.</p>
+            </div>
         </div>
 
         <!-- Tab Content: AM Aktivitas -->
@@ -574,9 +586,15 @@
                     <label for="amAktivitasDesc">Deskripsi Aktivitas:</label>
                     <textarea id="amAktivitasDesc" placeholder="Contoh: Mengatur jadwal pertemuan, Menindaklanjuti progres proyek" required></textarea>
                 </div>
+                <div class="form-group">
+                    <label for="amDokumentasi">Dokumentasi Gambar (Opsional):</label>
+                    <input type="file" id="amDokumentasi" accept="image/*">
+                </div>
                 <button type="submit" class="submit-button">Simpan Aktivitas AM</button>
             </form>
-             <!-- Catatan penting dihapus -->
+            <div class="info-note">
+                <p><strong>Catatan:</strong> Data aktivitas (termasuk gambar yang akan dikompres) disimpan secara lokal di browser Anda. Gambar akan dikompres saat diunggah untuk efisiensi penyimpanan.</p>
+            </div>
         </div>
 
         <!-- Tab Content: Ringkasan Harian -->
@@ -634,12 +652,12 @@
                             <th>Bagian</th>
                             <th>Karyawan</th>
                             <th>Deskripsi Aktivitas</th>
+                            <th>Dokumentasi</th>
                         </tr>
                     </thead>
                     <tbody>
                         <!-- Data will be populated here -->
                     </tbody>
-                </tbody>
                 </table>
             </div>
         </div>
@@ -653,8 +671,8 @@
 
     <script>
         // --- Simulasi Login ---
-        const USERNAME = 'Admin'; // Username telah diubah
-        const PASSWORD = 'admin'; // Password telah diubah
+        const USERNAME = 'Admin'; // Username
+        const PASSWORD = 'admin'; // Password
 
         document.addEventListener('DOMContentLoaded', function() {
             // Cek apakah user sudah login
@@ -734,10 +752,74 @@
             return activities ? JSON.parse(activities) : [];
         }
 
-        function saveActivity(activity) {
-            let activities = getActivities();
-            activities.push(activity);
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(activities));
+        // Fungsi saveActivity kini menerima file gambar dan mengkompresnya
+        function saveActivity(activity, imageFile) {
+            // Jika ada file gambar
+            if (imageFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const MAX_DIMENSION = 400; // Max width or height for the image
+
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > height) {
+                            if (width > MAX_DIMENSION) {
+                                height *= MAX_DIMENSION / width;
+                                width = MAX_DIMENSION;
+                            }
+                        } else {
+                            if (height > MAX_DIMENSION) {
+                                width *= MAX_DIMENSION / height;
+                                height = MAX_DIMENSION;
+                            }
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // Kompres gambar sebagai JPEG dengan kualitas 70%
+                        activity.image = canvas.toDataURL('image/jpeg', 0.7); 
+                        
+                        // Simpan data ke localStorage setelah gambar dikompres
+                        let activities = getActivities();
+                        activities.push(activity);
+                        try {
+                            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(activities));
+                            updateDailySummary();
+                        } catch (e) {
+                            if (e.name === 'QuotaExceededError') {
+                                alert('Peringatan: Ruang penyimpanan browser penuh. Beberapa data mungkin tidak tersimpan. Coba bersihkan aktivitas lama atau unggah gambar dengan ukuran lebih kecil.');
+                            } else {
+                                console.error('Error saving to localStorage:', e);
+                                alert('Terjadi kesalahan saat menyimpan data.');
+                            }
+                        }
+                    };
+                    img.src = e.target.result; // Muat gambar dari hasil reader
+                };
+                reader.readAsDataURL(imageFile); // Baca file sebagai URL data (Base64)
+            } else {
+                // Jika tidak ada file gambar, langsung simpan aktivitas
+                let activities = getActivities();
+                activities.push(activity);
+                try {
+                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(activities));
+                    updateDailySummary();
+                } catch (e) {
+                     if (e.name === 'QuotaExceededError') {
+                        alert('Peringatan: Ruang penyimpanan browser penuh. Coba bersihkan aktivitas lama.');
+                    } else {
+                        console.error('Error saving to localStorage:', e);
+                        alert('Terjadi kesalahan saat menyimpan data.');
+                    }
+                }
+            }
         }
 
         // --- Fitur Riset Data Mingguan Otomatis (Simulasi) ---
@@ -753,20 +835,23 @@
             });
 
             if (activities.length !== activitiesToKeep.length) {
-                alert('Data aktivitas lebih dari 7 hari yang lalu telah disimulasikan dihapus/dirangkum.');
+                // Hanya perbarui localStorage jika ada perubahan
                 localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(activitiesToKeep));
+                alert('Data aktivitas lebih dari 7 hari yang lalu telah disimulasikan dihapus/dirangkum untuk menghemat ruang penyimpanan.');
             }
             // Dalam aplikasi nyata, data lama mungkin diarsipkan ke database lain
         }
 
 
-        // --- Logika Form Input Aktivitas (Tanpa WhatsApp) ---
+        // --- Logika Form Input Aktivitas (dengan input gambar) ---
         function setupForm(formId, department) {
             document.getElementById(formId).addEventListener('submit', function(event) {
                 event.preventDefault(); // Mencegah reload halaman
 
                 const employee = this.querySelector('select').value;
                 const description = this.querySelector('textarea').value;
+                const imageInput = this.querySelector('input[type="file"]');
+                const imageFile = imageInput.files[0]; // Ambil file gambar pertama
                 const date = new Date().toISOString().slice(0, 10); // Format YYYY-MM-DD
                 
                 if (!employee || !description) {
@@ -777,19 +862,16 @@
                 const newActivity = {
                     date: date,
                     department: department,
-                    employee: employee,
+                    employee: employee, // Karyawan tetap disimpan
                     description: description,
-                    timestamp: new Date().toLocaleString()
+                    timestamp: new Date().toLocaleString(),
+                    image: null // Default tanpa gambar
                 };
 
-                saveActivity(newActivity);
+                // Panggil saveActivity dengan atau tanpa file gambar
+                saveActivity(newActivity, imageFile);
                 alert(`Aktivitas ${department} oleh ${employee} berhasil disimpan!`);
                 this.reset(); // Kosongkan form
-
-                // Perbarui ringkasan harian setelah menyimpan aktivitas
-                updateDailySummary();
-                
-                // Tidak ada lagi kode WhatsApp di sini
             });
         }
 
@@ -838,7 +920,7 @@
             if (data.length === 0) {
                 const row = tbody.insertRow();
                 const cell = row.insertCell();
-                cell.colSpan = 4;
+                cell.colSpan = 5; // Kolom bertambah karena ada gambar
                 cell.textContent = "Tidak ada data untuk rentang tanggal ini.";
                 cell.style.textAlign = "center";
                 // Tambahkan data-label untuk responsifitas jika ada 0 data
@@ -866,6 +948,22 @@
                 const cellDesc = row.insertCell();
                 cellDesc.textContent = activity.description;
                 cellDesc.setAttribute('data-label', 'Deskripsi Aktivitas');
+
+                const cellImage = row.insertCell();
+                cellImage.setAttribute('data-label', 'Dokumentasi');
+                if (activity.image) {
+                    const img = document.createElement('img');
+                    img.src = activity.image;
+                    img.style.maxWidth = '100px';
+                    img.style.maxHeight = '100px';
+                    img.style.display = 'block';
+                    img.style.margin = '0 auto';
+                    img.alt = 'Dokumentasi';
+                    cellImage.appendChild(img);
+                } else {
+                    cellImage.textContent = 'Tidak ada';
+                    cellImage.style.textAlign = 'center';
+                }
             });
         }
 
@@ -918,12 +1016,15 @@
             }
 
             let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Tanggal,Bagian,Karyawan,Deskripsi Aktivitas,Timestamp\n"; // Header CSV
+            // Header CSV sesuai permintaan: Kolom A, B, C, D, E (Tanggal, Bagian, Deskripsi Aktivitas, Timestamp, Dokumentasi)
+            csvContent += "Tanggal,Bagian,Deskripsi Aktivitas,Timestamp,Dokumentasi (Base64)\n"; 
 
             filteredActivities.forEach(activity => {
                 // Escape double quotes in description
                 let cleanedDescription = activity.description.replace(/"/g, '""');
-                let row = `${activity.date},${activity.department},${activity.employee},"${cleanedDescription}",${activity.timestamp}`;
+                // Tambahkan data gambar Base64 ke CSV. Kolom Karyawan tidak disertakan di CSV.
+                let imageData = activity.image ? `"${activity.image}"` : ''; // Bungkus dengan quote jika ada data
+                let row = `${activity.date},${activity.department},"${cleanedDescription}",${activity.timestamp},${imageData}`;
                 csvContent += row + "\n";
             });
 
@@ -934,7 +1035,7 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            alert('Data berhasil diekspor ke CSV!');
+            alert('Data berhasil diekspor ke CSV! Perhatikan: Gambar diekspor sebagai teks Base64 dan tidak akan muncul langsung sebagai gambar di Excel.');
         }
     </script>
 </body>
