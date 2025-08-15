@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PT. Infomedia Solusi Humanika - Pencatat Aktivitas Karyawan</title>
+    <style>
+        /* Desain Umum dan Responsif */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+            transition: background-color 0.3s ease;
+            overflow-x: hidden; /* Mencegah scroll horizontal pada mobile */
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: relative; /* Untuk posisi overlay */
+            min-height: 90vh; /* Agar konten selalu terlihat */
+            box-sizing: border-box;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: #ffffff;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+        }
+        header p {
+            margin: 5px 0 0;
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .logout-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+        }
+        .logout-button:hover {
+            background-color: #c0392b;
+        }
+
+
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* Untuk responsif */
+            gap: 10px; /* Jarak antar tombol */
+        }
+
+        .tab-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            flex: 1 1 auto; /* Untuk responsif */
+            min-width: 120px; /* Lebar minimum tombol */
+        }
+
+        .tab-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .tab-button.active {
+            background-color: #27ae60;
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fdfdfd;
+            animation: fadeIn 0.5s ease-out; /* Animasi transisi antar tab */
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        textarea,
+        select {
+            width: calc(100% - 22px); /* Mengkompensasi padding dan border */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            box-sizing: border-box; /* Pastikan padding tidak menambah lebar */
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        button.submit-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            width: 100%; /* Lebar penuh untuk tombol submit */
+            margin-top: 10px;
+        }
+
+        button.submit-button:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        }
+
+        /* Daily Summary Styling */
+        .summary-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .summary-card {
+            background-color: #e6f7ff;
+            border: 1px solid #b3e0ff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .summary-card h3 {
+            color: #2196f3;
+            margin-bottom: 10px;
+        }
+
+        .summary-card .count {
+            font-size: 2.8em;
+            font-weight: bold;
+            color: #3f51b5;
+            display: inline-block;
+            animation: popIn 0.5s ease-out; /* Animasi angka */
+        }
+
+        /* Research & Analysis Styling */
+        .analysis-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: flex-end;
+        }
+
+        .analysis-controls .form-group {
+            margin-bottom: 0; /* Override default form-group margin */
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .analysis-controls button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            flex-shrink: 0;
+            font-size: 0.95em;
+        }
+
+        .analysis-controls button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .analysis-results {
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        .simple-chart {
+            display: flex;
+            align-items: flex-end;
+            height: 200px;
+            border-left: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+            padding-left: 5px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+            overflow-x: auto; /* Untuk scroll jika banyak bar */
+        }
+
+        .chart-bar {
+            min-width: 60px; /* Lebar minimum untuk bar */
+            background-color: #3498db;
+            margin: 0 5px;
+            text-align: center;
+            color: white;
+            font-size: 0.8em;
+            transition: height 0.5s ease-out, background-color 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        .chart-bar:hover {
+            background-color: #2980b9;
+        }
+        .chart-bar span {
+            position: absolute;
+            top: -20px;
+            width: 100%;
+            text-align: center;
+            color: #333;
+            font-weight: bold;
+        }
+        .chart-bar-label {
+            position: absolute;
+            bottom: -20px;
+            width: 100%;
+            text-align: center;
+            font-size: 0.8em;
+            color: #555;
+            white-space: nowrap; /* Mencegah label putus baris */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.95em;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #e9e9e9;
+        }
+
+        /* Notifikasi WhatsApp Simulasi */
+        .whatsapp-note {
+            background-color: #d4edda;
+            border-left: 5px solid #28a745;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            color: #155724;
+        }
+
+        /* Overlay Login */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.3s ease;
+        }
+        .login-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .login-box {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: 90%;
+            max-width: 350px;
+            animation: fadeIn 0.5s ease-out;
+        }
+        .login-box h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .login-box input {
+            width: calc(100% - 20px);
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        .login-box button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .login-box button:hover {
+            background-color: #2980b9;
+        }
+
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            color: #777;
+            font-size: 0.9em;
+            background-color: #e0e0e0;
+            border-radius: 0 0 10px 10px;
+        }
+
+        /* Animasi dan Interaktivitas */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            80% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+                border-radius: 0; /* Full width on small screens */
+            }
+            header {
+                border-radius: 0;
+            }
+            .tabs {
+                flex-direction: column;
+                gap: 5px;
+            }
+            .tab-button {
+                margin: 0;
+                width: 100%; /* Full width buttons */
+            }
+            .summary-card-grid {
+                grid-template-columns: 1fr; /* Stack cards on small screens */
+            }
+            .analysis-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .analysis-controls .form-group {
+                min-width: unset;
+                width: 100%;
+            }
+            table, th, td {
+                display: block; /* Stack table cells */
+            }
+            th {
+                text-align: right;
+                position: relative;
+            }
+            td::before {
+                content: attr(data-label);
+                float: left;
+                font-weight: bold;
+                text-transform: uppercase;
+                margin-right: 10px;
+            }
+            tr {
+                margin-bottom: 15px;
+                display: block;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                padding: 10px;
+            }
+            th, td {
+                border: none;
+                padding: 8px 12px;
+            }
+            th:last-child { border-bottom: none; }
+            td:last-child { border-bottom: none; }
+            .simple-chart {
+                height: 150px;
+            }
+            .chart-bar {
+                min-width: 40px;
+            }
+            .chart-bar span {
+                font-size: 0.7em;
+            }
+            .chart-bar-label {
+                font-size: 0.7em;
+                bottom: -15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Overlay -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-box">
+            <h2>Login PT. Infomedia</h2>
+            <input type="text" id="usernameInput" placeholder="Username" required>
+            <input type="password" id="passwordInput" placeholder="Password" required>
+            <button onclick="performLogin()">Login</button>
+        </div>
+    </div>
+
+    <div class="container" id="mainAppContent" style="display: none;">
+        <header>
+            <h1>Sistem Pencatat Aktivitas Karyawan</h1>
+            <p>PT. Infomedia Solusi Humanika</p>
+            <button class="logout-button" onclick="performLogout()">Logout</button>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab(event, 'CmoAktivitas')">CMO</button>
+            <button class="tab-button" onclick="openTab(event, 'RekrutmenAktivitas')">Rekrutmen</button>
+            <button class="tab-button" onclick="openTab(event, 'AmAktivitas')">AM</button>
+            <button class="tab-button" onclick="openTab(event, 'RingkasanHarian')">Ringkasan Harian</button>
+            <button class="tab-button" onclick="openTab(event, 'AnalisisData')">Riset & Analisis</button>
+        </div>
+
+        <!-- Tab Content: CMO Aktivitas -->
+        <div id="CmoAktivitas" class="tab-content active">
+            <h2>Form Input Aktivitas CMO</h2>
+            <form id="cmoForm">
+                <div class="form-group">
+                    <label for="cmoKaryawan">Pilih Karyawan:</label>
+                    <select id="cmoKaryawan" required>
+                        <option value="">-- Pilih --</option>
+                        <option value="Dirga">Dirga</option>
+                        <option value="Dinda">Dinda</option>
+                        <option value="Khairul">Khairul</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="cmoAktivitasDesc">Deskripsi Aktivitas:</label>
+                    <textarea id="cmoAktivitasDesc" placeholder="Contoh: Membuat laporan bulanan, Meeting dengan klien X" required></textarea>
+                </div>
+                <button type="submit" class="submit-button">Simpan Aktivitas CMO</button>
+            </form>
+            <div class="whatsapp-note">
+                <p><strong>Catatan Penting (Pengiriman WhatsApp Otomatis):</strong> Fungsi pengiriman notifikasi/ringkasan ke WhatsApp (`089520526651`) **tidak dapat diimplementasikan secara otomatis langsung dari browser Anda**. Ini memerlukan **backend server dan integrasi dengan WhatsApp Business API yang kompleks dan berbayar.**</p>
+                <p>Dalam simulasi ini, setelah Anda menekan tombol simpan, sistem akan **mencoba membuka WhatsApp di perangkat Anda** dengan pesan yang sudah terisi. Anda perlu **menekan tombol KIRIM secara manual** di WhatsApp.</p>
+                <p>Data aktivitas akan disimpan di browser Anda secara lokal.</p>
+            </div>
+        </div>
+
+        <!-- Tab Content: Rekrutmen Aktivitas -->
+        <div id="RekrutmenAktivitas" class="tab-content">
+            <h2>Form Input Aktivitas Rekrutmen</h2>
+            <form id="rekrutmenForm">
+                <div class="form-group">
+                    <label for="rekrutmenKaryawan">Pilih Karyawan:</label>
+                    <select id="rekrutmenKaryawan" required>
+                        <option value="">-- Pilih --</option>
+                        <option value="Heri">Heri</option>
+                        <option value="April">April</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="rekrutmenAktivitasDesc">Deskripsi Aktivitas:</label>
+                    <textarea id="rekrutmenAktivitasDesc" placeholder="Contoh: Interview calon karyawan, Seleksi CV" required></textarea>
+                </div>
+                <button type="submit" class="submit-button">Simpan Aktivitas Rekrutmen</button>
+            </form>
+             <div class="whatsapp-note">
+                <p><strong>Catatan Penting (Pengiriman WhatsApp Otomatis):</strong> Fungsi pengiriman notifikasi/ringkasan ke WhatsApp (`089520526651`) **tidak dapat diimplementasikan secara otomatis langsung dari browser Anda**. Ini memerlukan **backend server dan integrasi dengan WhatsApp Business API yang kompleks dan berbayar.**</p>
+                <p>Dalam simulasi ini, setelah Anda menekan tombol simpan, sistem akan **mencoba membuka WhatsApp di perangkat Anda** dengan pesan yang sudah terisi. Anda perlu **menekan tombol KIRIM secara manual** di WhatsApp.</p>
+                <p>Data aktivitas akan disimpan di browser Anda secara lokal.</p>
+            </div>
+        </div>
+
+        <!-- Tab Content: AM Aktivitas -->
+        <div id="AmAktivitas" class="tab-content">
+            <h2>Form Input Aktivitas AM</h2>
+            <form id="amForm">
+                <div class="form-group">
+                    <label for="amKaryawan">Pilih Karyawan:</label>
+                    <select id="amKaryawan" required>
+                        <option value="">-- Pilih --</option>
+                        <option value="Frans">Frans</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="amAktivitasDesc">Deskripsi Aktivitas:</label>
+                    <textarea id="amAktivitasDesc" placeholder="Contoh: Mengatur jadwal pertemuan, Menindaklanjuti progres proyek" required></textarea>
+                </div>
+                <button type="submit" class="submit-button">Simpan Aktivitas AM</button>
+            </form>
+             <div class="whatsapp-note">
+                <p><strong>Catatan Penting (Pengiriman WhatsApp Otomatis):</strong> Fungsi pengiriman notifikasi/ringkasan ke WhatsApp (`089520526651`) **tidak dapat diimplementasikan secara otomatis langsung dari browser Anda**. Ini memerlukan **backend server dan integrasi dengan WhatsApp Business API yang kompleks dan berbayar.**</p>
+                <p>Dalam simulasi ini, setelah Anda menekan tombol simpan, sistem akan **mencoba membuka WhatsApp di perangkat Anda** dengan pesan yang sudah terisi. Anda perlu **menekan tombol KIRIM secara manual** di WhatsApp.</p>
+                <p>Data aktivitas akan disimpan di browser Anda secara lokal.</p>
+            </div>
+        </div>
+
+        <!-- Tab Content: Ringkasan Harian -->
+        <div id="RingkasanHarian" class="tab-content">
+            <h2>Ringkasan Aktivitas Harian</h2>
+            <p>Total entri aktivitas yang telah dikerjakan hari ini:</p>
+            <div class="summary-card-grid">
+                <div class="summary-card">
+                    <h3>CMO</h3>
+                    <div class="count" id="cmoDailyCount">0</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Rekrutmen</h3>
+                    <div class="count" id="rekrutmenDailyCount">0</div>
+                </div>
+                <div class="summary-card">
+                    <h3>AM</h3>
+                    <div class="count" id="amDailyCount">0</div>
+                </div>
+            </div>
+            <p style="margin-top: 20px; font-style: italic;">Data ini adalah ringkasan harian lokal di browser Anda.</p>
+        </div>
+
+        <!-- Tab Content: Riset & Analisis -->
+        <div id="AnalisisData" class="tab-content">
+            <h2>Riset & Analisis Data Aktivitas</h2>
+            <p>Analisis data aktivitas karyawan berdasarkan rentang tanggal.</p>
+            <div class="analysis-controls">
+                <div class="form-group">
+                    <label for="startDate">Dari Tanggal:</label>
+                    <input type="date" id="startDate">
+                </div>
+                <div class="form-group">
+                    <label for="endDate">Sampai Tanggal:</label>
+                    <input type="date" id="endDate">
+                </div>
+                <button onclick="performAnalysis()">Tampilkan Analisis</button>
+                <button onclick="exportDataToCsv()">Ekspor CSV</button>
+            </div>
+
+            <div class="analysis-results">
+                <h3>Ringkasan Periode Terpilih</h3>
+                <p id="analysisPeriodInfo">Pilih rentang tanggal untuk melihat data.</p>
+                
+                <h4>Grafik Sederhana (Jumlah Aktivitas per Bagian)</h4>
+                <div class="simple-chart" id="chartContainer">
+                    <!-- Bars will be generated here -->
+                </div>
+
+                <h4>Detail Aktivitas</h4>
+                <table id="analysisTable">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Bagian</th>
+                            <th>Karyawan</th>
+                            <th>Deskripsi Aktivitas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 PT. Infomedia Solusi Humanika. Hak Cipta Dilindungi.</p>
+    </footer>
+
+    <script>
+        // --- Simulasi Login ---
+        const USERNAME = 'Admin'; // Username telah diubah
+        const PASSWORD = 'admin'; // Password telah diubah
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cek apakah user sudah login
+            if (sessionStorage.getItem('loggedIn') === 'true') {
+                showAppContent();
+            } else {
+                showLoginOverlay();
+            }
+        });
+
+        function showLoginOverlay() {
+            document.getElementById('loginOverlay').classList.remove('hidden');
+            document.getElementById('mainAppContent').style.display = 'none';
+        }
+
+        function showAppContent() {
+            document.getElementById('loginOverlay').classList.add('hidden');
+            document.getElementById('mainAppContent').style.display = 'block';
+            document.querySelector('.tab-button').click(); // Aktifkan tab pertama
+            updateDailySummary(); // Perbarui ringkasan harian
+            // Atur tanggal default untuk input date pada analisis
+            const today = new Date();
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(today.getDate() - 7);
+            document.getElementById('endDate').value = today.toISOString().slice(0, 10);
+            document.getElementById('startDate').value = sevenDaysAgo.toISOString().slice(0, 10);
+        }
+
+        function performLogin() {
+            const username = document.getElementById('usernameInput').value;
+            const password = document.getElementById('passwordInput').value;
+
+            if (username === USERNAME && password === PASSWORD) {
+                sessionStorage.setItem('loggedIn', 'true');
+                showAppContent();
+                alert('Login berhasil! Selamat datang.');
+                // Jalankan pembersihan data lama setelah login (simulasi)
+                cleanUpOldActivities();
+            } else {
+                alert('Username atau password salah!');
+            }
+        }
+
+        function performLogout() {
+            sessionStorage.removeItem('loggedIn');
+            alert('Anda telah logout.');
+            // Jalankan pembersihan data lama saat logout (simulasi)
+            cleanUpOldActivities();
+            showLoginOverlay();
+        }
+
+        // --- Logika Navigasi Tab ---
+        function openTab(evt, tabName) {
+            let i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            tablinks = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+
+            // Perbarui ringkasan harian saat tab Ringkasan Harian dibuka
+            if (tabName === 'RingkasanHarian') {
+                updateDailySummary();
+            }
+        }
+
+        // --- Logika Penyimpanan Data (Menggunakan localStorage) ---
+        const LOCAL_STORAGE_KEY = 'infomedia_employee_activities';
+
+        function getActivities() {
+            let activities = localStorage.getItem(LOCAL_STORAGE_KEY);
+            return activities ? JSON.parse(activities) : [];
+        }
+
+        function saveActivity(activity) {
+            let activities = getActivities();
+            activities.push(activity);
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(activities));
+        }
+
+        // --- Fitur Riset Data Mingguan Otomatis (Simulasi) ---
+        function cleanUpOldActivities() {
+            let activities = getActivities();
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7); // Dapatkan tanggal 7 hari yang lalu
+
+            const activitiesToKeep = activities.filter(activity => {
+                const activityDate = new Date(activity.date);
+                // Bandingkan tanggal saja, abaikan waktu
+                return activityDate.setHours(0,0,0,0) >= sevenDaysAgo.setHours(0,0,0,0);
+            });
+
+            if (activities.length !== activitiesToKeep.length) {
+                alert('Data aktivitas lebih dari 7 hari yang lalu telah disimulasikan dihapus/dirangkum.');
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(activitiesToKeep));
+            }
+            // Dalam aplikasi nyata, data lama mungkin diarsipkan ke database lain
+        }
+
+
+        // --- Logika Form Input Aktivitas & Simulasi WhatsApp ---
+        const whatsappNumber = '6289520526651'; // Nomor WhatsApp target (ganti '0' dengan '62' untuk format internasional)
+
+        function setupForm(formId, department) {
+            document.getElementById(formId).addEventListener('submit', function(event) {
+                event.preventDefault(); // Mencegah reload halaman
+
+                const employee = this.querySelector('select').value;
+                const description = this.querySelector('textarea').value;
+                const date = new Date().toISOString().slice(0, 10); // Format YYYY-MM-DD
+                const currentTime = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+                if (!employee || !description) {
+                    alert('Mohon lengkapi semua field!');
+                    return;
+                }
+
+                const newActivity = {
+                    date: date,
+                    department: department,
+                    employee: employee,
+                    description: description,
+                    timestamp: new Date().toLocaleString()
+                };
+
+                saveActivity(newActivity);
+                alert(`Aktivitas ${department} oleh ${employee} berhasil disimpan!`);
+                this.reset(); // Kosongkan form
+
+                // Perbarui ringkasan harian setelah menyimpan aktivitas
+                updateDailySummary();
+
+                // --- Simulasi Pengiriman WhatsApp (Membutuhkan Interaksi Pengguna) ---
+                const whatsappMessage = encodeURIComponent(
+                    `*Pencatatan Aktivitas PT. Infomedia Solusi Humanika*\n\n` +
+                    `*Bagian:* ${department}\n` +
+                    `*Karyawan:* ${employee}\n` +
+                    `*Deskripsi Aktivitas:* ${description}\n` +
+                    `*Tanggal:* ${date}\n` +
+                    `*Waktu:* ${currentTime}\n\n` +
+                    `Mohon segera ditindaklanjuti.`
+                );
+
+                const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
+
+                console.log(`\n--- SIMULASI PENGIRIMAN WHATSAPP ---`);
+                console.log(`URL WhatsApp yang akan dibuka: ${whatsappUrl}`);
+                console.log(`CATATAN: Pengiriman WhatsApp otomatis tidak mungkin langsung dari browser. Anda perlu MENKAN TOMBOL KIRIM secara manual di aplikasi WhatsApp.`);
+                console.log(`-----------------------------------\n`);
+
+                // Buka WhatsApp di tab/jendela baru
+                window.open(whatsappUrl, '_blank');
+
+                alert(`Sistem akan membuka WhatsApp. Mohon tekan tombol KIRIM di aplikasi WhatsApp untuk menyelesaikan pengiriman notifikasi.`);
+            });
+        }
+
+        setupForm('cmoForm', 'CMO');
+        setupForm('rekrutmenForm', 'Rekrutmen');
+        setupForm('amForm', 'AM');
+
+        // --- Logika Ringkasan Harian ---
+        function updateDailySummary() {
+            const activities = getActivities();
+            const today = new Date().toISOString().slice(0, 10); // Dapatkan tanggal hari ini
+
+            const cmoCount = activities.filter(a => a.department === 'CMO' && a.date === today).length;
+            const rekrutmenCount = activities.filter(a => a.department === 'Rekrutmen' && a.date === today).length;
+            const amCount = activities.filter(a => a.department === 'AM' && a.date === today).length;
+
+            document.getElementById('cmoDailyCount').textContent = cmoCount;
+            document.getElementById('rekrutmenDailyCount').textContent = rekrutmenCount;
+            document.getElementById('amDailyCount').textContent = amCount;
+        }
+
+        // --- Logika Riset & Analisis ---
+        function performAnalysis() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (!startDate || !endDate) {
+                alert('Mohon pilih rentang tanggal!');
+                return;
+            }
+
+            const activities = getActivities();
+            const filteredActivities = activities.filter(activity => {
+                return activity.date >= startDate && activity.date <= endDate;
+            });
+
+            document.getElementById('analysisPeriodInfo').textContent = `Data untuk periode: ${startDate} hingga ${endDate}`;
+            renderAnalysisTable(filteredActivities);
+            renderSimpleChart(filteredActivities);
+        }
+
+        function renderAnalysisTable(data) {
+            const tbody = document.getElementById('analysisTable').querySelector('tbody');
+            tbody.innerHTML = ''; // Kosongkan tabel
+            
+            if (data.length === 0) {
+                const row = tbody.insertRow();
+                const cell = row.insertCell();
+                cell.colSpan = 4;
+                cell.textContent = "Tidak ada data untuk rentang tanggal ini.";
+                cell.style.textAlign = "center";
+                // Tambahkan data-label untuk responsifitas jika ada 0 data
+                cell.setAttribute('data-label', 'Informasi');
+                return;
+            }
+
+            // Sort data by date for better readability
+            data.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            data.forEach(activity => {
+                const row = tbody.insertRow();
+                const cellDate = row.insertCell();
+                cellDate.textContent = activity.date;
+                cellDate.setAttribute('data-label', 'Tanggal');
+
+                const cellDept = row.insertCell();
+                cellDept.textContent = activity.department;
+                cellDept.setAttribute('data-label', 'Bagian');
+
+                const cellEmp = row.insertCell();
+                cellEmp.textContent = activity.employee;
+                cellEmp.setAttribute('data-label', 'Karyawan');
+
+                const cellDesc = row.insertCell();
+                cellDesc.textContent = activity.description;
+                cellDesc.setAttribute('data-label', 'Deskripsi Aktivitas');
+            });
+        }
+
+        function renderSimpleChart(data) {
+            const chartContainer = document.getElementById('chartContainer');
+            chartContainer.innerHTML = ''; // Clear previous chart
+
+            const departmentCounts = { CMO: 0, Rekrutmen: 0, AM: 0 };
+            data.forEach(activity => {
+                if (departmentCounts.hasOwnProperty(activity.department)) {
+                    departmentCounts[activity.department]++;
+                }
+            });
+
+            const maxCount = Math.max(...Object.values(departmentCounts));
+            
+            for (const dept in departmentCounts) {
+                const bar = document.createElement('div');
+                bar.classList.add('chart-bar');
+                // Hitung tinggi bar, minimum 10px jika count > 0 agar terlihat
+                const height = maxCount > 0 ? Math.max(10, (departmentCounts[dept] / maxCount) * 180) : 0; 
+                bar.style.height = `${height}px`;
+                
+                bar.innerHTML = `
+                    <span>${departmentCounts[dept]}</span>
+                    <span class="chart-bar-label">${dept}</span>
+                `;
+                chartContainer.appendChild(bar);
+            }
+        }
+
+
+        function exportDataToCsv() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (!startDate || !endDate) {
+                alert('Mohon pilih rentang tanggal untuk ekspor!');
+                return;
+            }
+
+            const activities = getActivities();
+            const filteredActivities = activities.filter(activity => {
+                return activity.date >= startDate && activity.date <= endDate;
+            });
+
+            if (filteredActivities.length === 0) {
+                alert('Tidak ada data untuk diekspor dalam rentang tanggal ini.');
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Tanggal,Bagian,Karyawan,Deskripsi Aktivitas,Timestamp\n"; // Header CSV
+
+            filteredActivities.forEach(activity => {
+                // Escape double quotes in description
+                let cleanedDescription = activity.description.replace(/"/g, '""');
+                let row = `${activity.date},${activity.department},${activity.employee},"${cleanedDescription}",${activity.timestamp}`;
+                csvContent += row + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `aktivitas_infomedia_${startDate}_${endDate}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            alert('Data berhasil diekspor ke CSV!');
+        }
+    </script>
+</body>
+</html>
